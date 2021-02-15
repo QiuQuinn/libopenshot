@@ -28,25 +28,24 @@
  * along with OpenShot Library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "UnitTest++.h"
+#include <catch2/catch.hpp>
 // Prevent name clashes with juce::UnitTest
 #define DONT_SET_USING_JUCE_NAMESPACE 1
 #include "Settings.h"
 
-using namespace std;
 using namespace openshot;
 
-TEST(Settings_Default_Constructor)
+TEST_CASE( "Default_Constructor", "[libopenshot][settings]" )
 {
 	// Create an empty color
 	Settings *s = Settings::Instance();
 
-	CHECK_EQUAL(12, s->OMP_THREADS);
-	CHECK_EQUAL(false, s->HIGH_QUALITY_SCALING);
-	CHECK_EQUAL(false, s->WAIT_FOR_VIDEO_PROCESSING_TASK);
+	CHECK(s->OMP_THREADS == 12);
+	CHECK_FALSE(s->HIGH_QUALITY_SCALING);
+	CHECK_FALSE(s->WAIT_FOR_VIDEO_PROCESSING_TASK);
 }
 
-TEST(Settings_Change_Settings)
+TEST_CASE( "Change_Settings", "[libopenshot][settings]" )
 {
 	// Create an empty color
 	Settings *s = Settings::Instance();
@@ -54,11 +53,11 @@ TEST(Settings_Change_Settings)
 	s->HIGH_QUALITY_SCALING = true;
 	s->WAIT_FOR_VIDEO_PROCESSING_TASK = true;
 
-	CHECK_EQUAL(8, s->OMP_THREADS);
-	CHECK_EQUAL(true, s->HIGH_QUALITY_SCALING);
-	CHECK_EQUAL(true, s->WAIT_FOR_VIDEO_PROCESSING_TASK);
+	CHECK(s->OMP_THREADS == 8);
+	CHECK(s->HIGH_QUALITY_SCALING == true);
+	CHECK(s->WAIT_FOR_VIDEO_PROCESSING_TASK == true);
 
-	CHECK_EQUAL(8, Settings::Instance()->OMP_THREADS);
-	CHECK_EQUAL(true, Settings::Instance()->HIGH_QUALITY_SCALING);
-	CHECK_EQUAL(true, Settings::Instance()->WAIT_FOR_VIDEO_PROCESSING_TASK);
+	CHECK(Settings::Instance()->OMP_THREADS == 8);
+	CHECK(Settings::Instance()->HIGH_QUALITY_SCALING == true);
+	CHECK(Settings::Instance()->WAIT_FOR_VIDEO_PROCESSING_TASK == true);
 }

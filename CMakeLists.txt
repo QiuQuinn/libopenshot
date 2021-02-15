@@ -73,10 +73,16 @@ include(FeatureSummary)
 # Optional build settings for libopenshot
 option(USE_SYSTEM_JSONCPP "Use system installed JsonCpp, if found" ON)
 option(DISABLE_BUNDLED_JSONCPP "Don't fall back to bundled JsonCpp" OFF)
+
 option(ENABLE_IWYU "Enable 'Include What You Use' scanner (CMake 3.3+)" OFF)
+
 option(ENABLE_TESTS "Build unit tests (requires UnitTest++)" ON)
+option(USE_CATCH2 "Enable Catch2-based unit tests" ON)
+option(ENABLE_PARALLEL_CTEST "Run CTest using multiple processors" ON)
 option(ENABLE_COVERAGE "Scan test coverage using gcov and report" OFF)
+
 option(ENABLE_DOCS "Build API documentation (requires Doxygen)" ON)
+
 option(APPIMAGE_BUILD "Build to install in an AppImage (Linux only)" OFF)
 option(ENABLE_MAGICK "Use ImageMagick, if available" ON)
 option(ENABLE_OPENCV "Build with OpenCV algorithms (requires Boost, Protobuf 3)" ON)
@@ -171,41 +177,83 @@ add_feature_info("Documentation" DOCS_ENABLED "Build API documentation with 'mak
 ############# PROCESS tests/ DIRECTORY ##############
 if(ENABLE_TESTS)
   set(TESTS_ENABLED TRUE) # May be overridden by tests/CMakeLists.txt
+  if (USE_CATCH2)
+    find_package(Catch2 REQUIRED)
+    if(ENABLE_PARALLEL_CTEST)
+      # Figure out the amount of parallelism for CTest
+      include(ProcessorCount)
+      ProcessorCount(CPU_COUNT)
+      if(NOT CPU_COUNT EQUAL 0)
+        message(STATUS "Setting up unit tests to use ${CPU_COUNT} processors")
+        set(CTEST_OPTIONS "-j${CPU_COUNT}")
+      endif()
+    endif()
+    include(CTest)
+    include(Catch)
+  endif()
   add_subdirectory(tests)
 endif()
 add_feature_info("Unit tests" TESTS_ENABLED "Compile unit tests for library functions")
 
 ############## COVERAGE REPORTING #################
 if (ENABLE_COVERAGE)
-  setup_target_for_coverage_lcov(
-    NAME coverage
-    LCOV_ARGS "--no-external"
-    EXECUTABLE openshot-test
-    DEPENDENCIES openshot openshot-test
-    EXCLUDE
-      "bindings/*"
-      "examples/*"
-      "${CMAKE_CURRENT_BINARY_DIR}/bindings/*"
-      "${CMAKE_CURRENT_BINARY_DIR}/src/*_autogen/*"
-  )
-  if(NOT TARGET os_test)
-    add_custom_target(os_test)
-    add_dependencies(os_test coverage)
+  if (DEFINED CATCH2_TEST_TARGETS)
+    setup_target_for_coverage_lcov(
+      NAME coverage
+      LCOV_ARGS "--no-external"
+      EXECUTABLE ctest
+      EXECUTABLE_ARGS ${CTEST_OPTIONS}
+      DEPENDENCIES openshot ${CATCH2_TEST_TARGETS}
+      EXCLUDE
+        "bindings/*"
+        "examples/*"
+        "${CMAKE_CURRENT_BINARY_DIR}/bindings/*"
+        "${CMAKE_CURRENT_BINARY_DIR}/src/*_autogen/*"
+    )
+  else()
+    setup_target_for_coverage_lcov(
+      NAME coverage
+      LCOV_ARGS "--no-external"
+      EXECUTABLE ${UNIT_TEST_TARGETS}
+      DEPENDENCIES openshot
+      EXCLUDE
+        "bindings/*"
+        "examples/*"
+        "${CMAKE_CURRENT_BINARY_DIR}/bindings/*"
+        "${CMAKE_CURRENT_BINARY_DIR}/src/*_autogen/*"
+    )
   endif()
 endif()
 
-# Also hook up 'test' as an alias for the 'os_test' target, if possible
-# This requires CMake 3.11+, where the CMP0037 policy
-# configured to 'NEW' mode will not reserve target names
-# unless the corresponding feature is actually used
-if (POLICY CMP0037)
-	cmake_policy(SET CMP0037 NEW)
+if(TESTS_ENABLED AND NOT TARGET coverage)
+  add_custom_target(coverage
+    COMMAND ctest ${CTEST_OPTIONS}
+    DEPENDS openshot ${CATCH2_TEST_TARGETS} ${UNIT_TEST_TARGETS}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Running unit tests (coverage disabled)"
+  )
 endif()
-if(TARGET os_test)
-  if (CMAKE_VERSION VERSION_GREATER 3.11)
-    message(STATUS "Cmake 3.11+ detected, enabling 'test' target")
-    add_custom_target(test)
-    add_dependencies(test os_test)
+
+if(TARGET test AND NOT TARGET os_test)
+  add_custom_target(os_test)
+  add_dependencies(os_test coverage)
+endif()
+
+if(TARGET os_test AND NOT TARGET test AND CMAKE_VERSION VERSION_GREATER 3.11)
+  # Also hook up 'test' as an alias for the 'os_test' target, if possible
+  # This requires CMake 3.11+, where the CMP0037 policy
+  # configured to 'NEW' mode will not reserve target names
+  # unless the corresponding feature is actually used
+  if (POLICY CMP0037)
+  	cmake_policy(SET CMP0037 NEW)
+  endif()
+  message(STATUS "Cmake 3.11+ detected, enabling 'test' target")
+  add_custom_target(test)
+  add_dependencies(test os_test)
+endif()
+
+if(TESTS_ENABLED)
+  if(TARGET test)
     set(TEST_TARGET_NAME "test")
   else()
     set(TEST_TARGET_NAME "os_test")

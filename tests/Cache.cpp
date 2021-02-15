@@ -30,7 +30,7 @@
 
 #include <memory>
 
-#include "UnitTest++.h"
+#include <catch2/catch.hpp>
 // Prevent name clashes with juce::UnitTest
 #define DONT_SET_USING_JUCE_NAMESPACE 1
 #include "CacheDisk.h"
@@ -41,7 +41,7 @@
 
 using namespace openshot;
 
-TEST(Cache_Default_Constructor)
+TEST_CASE( "CacheMemory_Default_Constructor", "[libopenshot][cache]" )
 {
 	// Create cache object
 	CacheMemory c;
@@ -55,11 +55,11 @@ TEST(Cache_Default_Constructor)
 		c.Add(f);
 	}
 
-	CHECK_EQUAL(50, c.Count()); // Cache should have all frames, with no limit
-	CHECK_EQUAL(0, c.GetMaxBytes()); // Max frames should default to 0
+	CHECK(c.Count() == 50); // Cache should have all frames, with no limit
+	CHECK(c.GetMaxBytes() == 0); // Max frames should default to 0
 }
 
-TEST(Cache_Max_Bytes_Constructor)
+TEST_CASE( "Max_Bytes_Constructor", "[libopenshot][cache]" )
 {
 	// Create cache object (with a max of 5 previous items)
 	CacheMemory c(250 * 1024);
@@ -74,7 +74,7 @@ TEST(Cache_Max_Bytes_Constructor)
 	}
 
 	// Cache should have all 20
-	CHECK_EQUAL(20, c.Count());
+	CHECK(c.Count() == 20);
 
 	// Add 10 frames again
 	for (int i = 10; i > 0; i--)
@@ -86,19 +86,19 @@ TEST(Cache_Max_Bytes_Constructor)
 	}
 
 	// Count should be 20, since we're more frames than can be cached.
-	CHECK_EQUAL(20, c.Count());
+	CHECK(c.Count() == 20);
 
 	// Check which items the cache kept
-	CHECK_EQUAL(true, c.GetFrame(1) != NULL);
-	CHECK_EQUAL(true, c.GetFrame(10) != NULL);
-	CHECK_EQUAL(true, c.GetFrame(11) != NULL);
-	CHECK_EQUAL(true, c.GetFrame(19) != NULL);
-	CHECK_EQUAL(true, c.GetFrame(20) != NULL);
-	CHECK_EQUAL(false, c.GetFrame(21) != NULL);
-	CHECK_EQUAL(false, c.GetFrame(30) != NULL);
+	CHECK(c.GetFrame(1) != nullptr);
+	CHECK(c.GetFrame(10) != nullptr);
+	CHECK(c.GetFrame(11) != nullptr);
+	CHECK(c.GetFrame(19) != nullptr);
+	CHECK(c.GetFrame(20) != nullptr);
+	CHECK(c.GetFrame(21) == nullptr);
+	CHECK(c.GetFrame(30) == nullptr);
 }
 
-TEST(Cache_Clear)
+TEST_CASE( "Clear", "[libopenshot][cache]" )
 {
 	// Create cache object
 	CacheMemory c(250 * 1024);
@@ -113,16 +113,16 @@ TEST(Cache_Clear)
 	}
 
 	// Cache should only have 10 items
-	CHECK_EQUAL(10, c.Count());
+	CHECK(c.Count() == 10);
 
 	// Clear Cache
 	c.Clear();
 
 	// Cache should now have 0 items
-	CHECK_EQUAL(0, c.Count());
+	CHECK(c.Count() == 0);
 }
 
-TEST(Cache_Add_Duplicate_Frames)
+TEST_CASE( "Add_Duplicate_Frames", "[libopenshot][cache]" )
 {
 	// Create cache object
 	CacheMemory c(250 * 1024);
@@ -136,10 +136,10 @@ TEST(Cache_Add_Duplicate_Frames)
 	}
 
 	// Cache should only have 1 items (since all frames were frame #1)
-	CHECK_EQUAL(1, c.Count());
+	CHECK(c.Count() == 1);
 }
 
-TEST(Cache_Check_If_Frame_Exists)
+TEST_CASE( "Check_If_Frame_Exists", "[libopenshot][cache]" )
 {
 	// Create cache object
 	CacheMemory c(250 * 1024);
@@ -154,16 +154,16 @@ TEST(Cache_Check_If_Frame_Exists)
 	}
 
 	// Check if certain frames exists (only 1-5 exist)
-	CHECK_EQUAL(false, c.GetFrame(0) != NULL);
-	CHECK_EQUAL(true, c.GetFrame(1) != NULL);
-	CHECK_EQUAL(true, c.GetFrame(2) != NULL);
-	CHECK_EQUAL(true, c.GetFrame(3) != NULL);
-	CHECK_EQUAL(true, c.GetFrame(4) != NULL);
-	CHECK_EQUAL(true, c.GetFrame(5) != NULL);
-	CHECK_EQUAL(false, c.GetFrame(6) != NULL);
+	CHECK(c.GetFrame(0) == nullptr);
+	CHECK(c.GetFrame(1) != nullptr);
+	CHECK(c.GetFrame(2) != nullptr);
+	CHECK(c.GetFrame(3) != nullptr);
+	CHECK(c.GetFrame(4) != nullptr);
+	CHECK(c.GetFrame(5) != nullptr);
+	CHECK(c.GetFrame(6) == nullptr);
 }
 
-TEST(Cache_GetFrame)
+TEST_CASE( "GetFrame", "[libopenshot][cache]" )
 {
 	// Create cache object
 	CacheMemory c(250 * 1024);
@@ -179,16 +179,16 @@ TEST(Cache_GetFrame)
 	c.Add(std::shared_ptr<Frame>(green));
 
 	// Get frames
-	CHECK_EQUAL(true, c.GetFrame(0) == NULL);
-	CHECK_EQUAL(true, c.GetFrame(4) == NULL);
+	CHECK(c.GetFrame(0) == nullptr);
+	CHECK(c.GetFrame(4) == nullptr);
 
 	// Check if certain frames exists (only 1-5 exist)
-	CHECK_EQUAL(1, c.GetFrame(1)->number);
-	CHECK_EQUAL(2, c.GetFrame(2)->number);
-	CHECK_EQUAL(3, c.GetFrame(3)->number);
+	CHECK(c.GetFrame(1)->number == 1);
+	CHECK(c.GetFrame(2)->number == 2);
+	CHECK(c.GetFrame(3)->number == 3);
 }
 
-TEST(Cache_GetSmallest)
+TEST_CASE( "GetSmallest", "[libopenshot][cache]" )
 {
 	// Create cache object (with a max of 10 items)
 	CacheMemory c(250 * 1024);
@@ -204,19 +204,19 @@ TEST(Cache_GetSmallest)
 	c.Add(std::shared_ptr<Frame>(green));
 
 	// Check if frame 1 is the front
-	CHECK_EQUAL(1, c.GetSmallestFrame()->number);
+	CHECK(c.GetSmallestFrame()->number == 1);
 
 	// Check if frame 1 is STILL the front
-	CHECK_EQUAL(1, c.GetSmallestFrame()->number);
+	CHECK(c.GetSmallestFrame()->number == 1);
 
 	// Erase frame 1
 	c.Remove(1);
 
 	// Check if frame 2 is the front
-	CHECK_EQUAL(2, c.GetSmallestFrame()->number);
+	CHECK(c.GetSmallestFrame()->number == 2);
 }
 
-TEST(Cache_Remove)
+TEST_CASE( "Remove", "[libopenshot][cache]" )
 {
 	// Create cache object (with a max of 10 items)
 	CacheMemory c(250 * 1024);
@@ -232,31 +232,31 @@ TEST(Cache_Remove)
 	c.Add(std::shared_ptr<Frame>(green));
 
 	// Check if count is 3
-	CHECK_EQUAL(3, c.Count());
+	CHECK(c.Count() == 3);
 
 	// Check if frame 2 exists
-	CHECK_EQUAL(true, c.GetFrame(2) != NULL);
+	CHECK(c.GetFrame(2) != nullptr);
 
 	// Remove frame 2
 	c.Remove(2);
 
 	// Check if frame 2 exists
-	CHECK_EQUAL(false, c.GetFrame(2) != NULL);
+	CHECK(c.GetFrame(2) == nullptr);
 
 	// Check if count is 2
-	CHECK_EQUAL(2, c.Count());
+	CHECK(c.Count() == 2);
 
 	// Remove frame 1
 	c.Remove(1);
 
 	// Check if frame 1 exists
-	CHECK_EQUAL(false, c.GetFrame(1) != NULL);
+	CHECK(c.GetFrame(1) == nullptr);
 
 	// Check if count is 1
-	CHECK_EQUAL(1, c.Count());
+	CHECK(c.Count() == 1);
 }
 
-TEST(Cache_Set_Max_Bytes)
+TEST_CASE( "Set_Max_Bytes", "[libopenshot][cache]" )
 {
 	// Create cache object
 	CacheMemory c;
@@ -270,18 +270,18 @@ TEST(Cache_Set_Max_Bytes)
 		c.Add(f);
 	}
 
-	CHECK_EQUAL(0, c.GetMaxBytes()); // Cache defaults max frames to -1, unlimited frames
+	CHECK(c.GetMaxBytes() == 0); // Cache defaults max frames to -1, unlimited frames
 
 	// Set max frames
 	c.SetMaxBytes(8 * 1024);
-	CHECK_EQUAL(8 * 1024, c.GetMaxBytes());
+	CHECK(c.GetMaxBytes() == 8 * 1024);
 
 	// Set max frames
 	c.SetMaxBytes(4 * 1024);
-	CHECK_EQUAL(4 * 1024, c.GetMaxBytes());
+	CHECK(c.GetMaxBytes() == 4 * 1024);
 }
 
-TEST(Cache_Multiple_Remove)
+TEST_CASE( "Multiple_Remove", "[libopenshot][cache]" )
 {
 	// Create cache object (using platform /temp/ directory)
 	CacheMemory c;
@@ -300,16 +300,16 @@ TEST(Cache_Multiple_Remove)
 	}
 
 	// Should have 20 frames
-	CHECK_EQUAL(20, c.Count());
+	CHECK(c.Count() == 20);
 
 	// Remove all 20 frames
 	c.Remove(1, 20);
 
 	// Should have 20 frames
-	CHECK_EQUAL(0, c.Count());
+	CHECK(c.Count() == 0);
 }
 
-TEST(CacheDisk_Set_Max_Bytes)
+TEST_CASE( "CacheDisk_Set_Max_Bytes", "[libopenshot][cache]" )
 {
 	// Create cache object (using platform /temp/ directory)
 	CacheDisk c("", "PPM", 1.0, 0.25);
@@ -327,40 +327,40 @@ TEST(CacheDisk_Set_Max_Bytes)
 		c.Add(f);
 	}
 
-	CHECK_EQUAL(0, c.GetMaxBytes()); // Cache defaults max frames to -1, unlimited frames
+	CHECK(c.GetMaxBytes() == 0); // Cache defaults max frames to -1, unlimited frames
 
 	// Set max frames
 	c.SetMaxBytes(8 * 1024);
-	CHECK_EQUAL(8 * 1024, c.GetMaxBytes());
+	CHECK(c.GetMaxBytes() == 8 * 1024);
 
 	// Set max frames
 	c.SetMaxBytes(4 * 1024);
-	CHECK_EQUAL(4 * 1024, c.GetMaxBytes());
+	CHECK(c.GetMaxBytes() == 4 * 1024);
 
 	// Read frames from disk cache
 	std::shared_ptr<Frame> f = c.GetFrame(5);
-	CHECK_EQUAL(320, f->GetWidth());
-	CHECK_EQUAL(180, f->GetHeight());
-	CHECK_EQUAL(2, f->GetAudioChannelsCount());
-	CHECK_EQUAL(500, f->GetAudioSamplesCount());
-	CHECK_EQUAL(LAYOUT_STEREO, f->ChannelsLayout());
-	CHECK_EQUAL(44100, f->SampleRate());
+	CHECK(f->GetWidth() == 320);
+	CHECK(f->GetHeight() == 180);
+	CHECK(f->GetAudioChannelsCount() == 2);
+	CHECK(f->GetAudioSamplesCount() == 500);
+	CHECK(f->ChannelsLayout() == LAYOUT_STEREO);
+	CHECK(f->SampleRate() == 44100);
 
 	// Check count of cache
-	CHECK_EQUAL(20, c.Count());
+	CHECK(c.Count() == 20);
 
 	// Clear cache
 	c.Clear();
 
 	// Check count of cache
-	CHECK_EQUAL(0, c.Count());
+	CHECK(c.Count() == 0);
 
 	// Delete cache directory
 	QDir path = QDir::tempPath() + QString("/preview-cache/");
 	path.removeRecursively();
 }
 
-TEST(CacheDisk_Multiple_Remove)
+TEST_CASE( "CacheDisk_Multiple_Remove", "[libopenshot][cache]" )
 {
 	// Create cache object (using platform /temp/ directory)
 	CacheDisk c("", "PPM", 1.0, 0.25);
@@ -379,20 +379,20 @@ TEST(CacheDisk_Multiple_Remove)
 	}
 
 	// Should have 20 frames
-	CHECK_EQUAL(20, c.Count());
+	CHECK(c.Count() == 20);
 
 	// Remove all 20 frames
 	c.Remove(1, 20);
 
 	// Should have 20 frames
-	CHECK_EQUAL(0, c.Count());
+	CHECK(c.Count() == 0);
 
 	// Delete cache directory
 	QDir path = QDir::tempPath() + QString("/preview-cache/");
 	path.removeRecursively();
 }
 
-TEST(CacheDisk_JSON)
+TEST_CASE( "CacheDisk_JSON", "[libopenshot][cache]" )
 {
 	// Create cache object (using platform /temp/ directory)
 	CacheDisk c("", "PPM", 1.0, 0.25);
@@ -400,39 +400,39 @@ TEST(CacheDisk_JSON)
 	// Add some frames (out of order)
 	std::shared_ptr<Frame> f3(new Frame(3, 1280, 720, "Blue", 500, 2));
 	c.Add(f3);
-	CHECK_EQUAL(1, (int)c.JsonValue()["ranges"].size());
-	CHECK_EQUAL("1", c.JsonValue()["version"].asString());
+	CHECK((int)c.JsonValue()["ranges"].size() == 1);
+	CHECK(c.JsonValue()["version"].asString() == "1");
 
 	// Add some frames (out of order)
 	std::shared_ptr<Frame> f1(new Frame(1, 1280, 720, "Blue", 500, 2));
 	c.Add(f1);
-	CHECK_EQUAL(2, (int)c.JsonValue()["ranges"].size());
-	CHECK_EQUAL("2", c.JsonValue()["version"].asString());
+	CHECK((int)c.JsonValue()["ranges"].size() == 2);
+	CHECK(c.JsonValue()["version"].asString() == "2");
 
 	// Add some frames (out of order)
 	std::shared_ptr<Frame> f2(new Frame(2, 1280, 720, "Blue", 500, 2));
 	c.Add(f2);
-	CHECK_EQUAL(1, (int)c.JsonValue()["ranges"].size());
-	CHECK_EQUAL("3", c.JsonValue()["version"].asString());
+	CHECK((int)c.JsonValue()["ranges"].size() == 1);
+	CHECK(c.JsonValue()["version"].asString() == "3");
 
 	// Add some frames (out of order)
 	std::shared_ptr<Frame> f5(new Frame(5, 1280, 720, "Blue", 500, 2));
 	c.Add(f5);
-	CHECK_EQUAL(2, (int)c.JsonValue()["ranges"].size());
-	CHECK_EQUAL("4", c.JsonValue()["version"].asString());
+	CHECK((int)c.JsonValue()["ranges"].size() == 2);
+	CHECK(c.JsonValue()["version"].asString() == "4");
 
 	// Add some frames (out of order)
 	std::shared_ptr<Frame> f4(new Frame(4, 1280, 720, "Blue", 500, 2));
 	c.Add(f4);
-	CHECK_EQUAL(1, (int)c.JsonValue()["ranges"].size());
-	CHECK_EQUAL("5", c.JsonValue()["version"].asString());
+	CHECK((int)c.JsonValue()["ranges"].size() == 1);
+	CHECK(c.JsonValue()["version"].asString() == "5");
 
 	// Delete cache directory
 	QDir path = QDir::tempPath() + QString("/preview-cache/");
 	path.removeRecursively();
 }
 
-TEST(CacheMemory_JSON)
+TEST_CASE( "CacheMemory_JSON", "[libopenshot][cache]" )
 {
 	// Create memory cache object
 	CacheMemory c;
@@ -440,31 +440,31 @@ TEST(CacheMemory_JSON)
 	// Add some frames (out of order)
 	std::shared_ptr<Frame> f3(new Frame(3, 1280, 720, "Blue", 500, 2));
 	c.Add(f3);
-	CHECK_EQUAL(1, (int)c.JsonValue()["ranges"].size());
-	CHECK_EQUAL("1", c.JsonValue()["version"].asString());
+	CHECK((int)c.JsonValue()["ranges"].size() == 1);
+	CHECK(c.JsonValue()["version"].asString() == "1");
 
 	// Add some frames (out of order)
 	std::shared_ptr<Frame> f1(new Frame(1, 1280, 720, "Blue", 500, 2));
 	c.Add(f1);
-	CHECK_EQUAL(2, (int)c.JsonValue()["ranges"].size());
-	CHECK_EQUAL("2", c.JsonValue()["version"].asString());
+	CHECK((int)c.JsonValue()["ranges"].size() == 2);
+	CHECK(c.JsonValue()["version"].asString() == "2");
 
 	// Add some frames (out of order)
 	std::shared_ptr<Frame> f2(new Frame(2, 1280, 720, "Blue", 500, 2));
 	c.Add(f2);
-	CHECK_EQUAL(1, (int)c.JsonValue()["ranges"].size());
-	CHECK_EQUAL("3", c.JsonValue()["version"].asString());
+	CHECK((int)c.JsonValue()["ranges"].size() == 1);
+	CHECK(c.JsonValue()["version"].asString() == "3");
 
 	// Add some frames (out of order)
 	std::shared_ptr<Frame> f5(new Frame(5, 1280, 720, "Blue", 500, 2));
 	c.Add(f5);
-	CHECK_EQUAL(2, (int)c.JsonValue()["ranges"].size());
-	CHECK_EQUAL("4", c.JsonValue()["version"].asString());
+	CHECK((int)c.JsonValue()["ranges"].size() == 2);
+	CHECK(c.JsonValue()["version"].asString() == "4");
 
 	// Add some frames (out of order)
 	std::shared_ptr<Frame> f4(new Frame(4, 1280, 720, "Blue", 500, 2));
 	c.Add(f4);
-	CHECK_EQUAL(1, (int)c.JsonValue()["ranges"].size());
-	CHECK_EQUAL("5", c.JsonValue()["version"].asString());
+	CHECK((int)c.JsonValue()["ranges"].size() == 1);
+	CHECK(c.JsonValue()["version"].asString() == "5");
 
 }

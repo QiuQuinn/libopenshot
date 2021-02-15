@@ -28,7 +28,7 @@
  * along with OpenShot Library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "UnitTest++.h"
+#include <catch2/catch.hpp>
 // Prevent name clashes with juce::UnitTest
 #define DONT_SET_USING_JUCE_NAMESPACE 1
 #include "QGuiApplication"
@@ -37,16 +37,13 @@
 using namespace std;
 using namespace openshot;
 
-SUITE(QtImageReader)
-{
-
-TEST(Default_Constructor)
+TEST_CASE( "Default_Constructor", "[libopenshot][qtimagereader]" )
 {
 	// Check invalid path
-	CHECK_THROW(QtImageReader(""), InvalidFile);
+	CHECK_THROWS_AS(QtImageReader(""), InvalidFile);
 }
 
-TEST(GetFrame_Before_Opening)
+TEST_CASE( "GetFrame_Before_Opening", "[libopenshot][qtimagereader]" )
 {
 	// Create a reader
 	stringstream path;
@@ -54,10 +51,10 @@ TEST(GetFrame_Before_Opening)
     QtImageReader r(path.str());
 
 	// Check invalid path
-	CHECK_THROW(r.GetFrame(1), ReaderClosed);
+	CHECK_THROWS_AS(r.GetFrame(1), ReaderClosed);
 }
 
-TEST(Check_SVG_Loading)
+TEST_CASE( "Check_SVG_Loading", "[libopenshot][qtimagereader]" )
 {
 	// Create a reader
 	stringstream path;
@@ -68,8 +65,8 @@ TEST(Check_SVG_Loading)
 	// Get frame, with no Timeline or Clip
 	// Default SVG scaling sizes things to 1920x1080
 	std::shared_ptr<Frame> f = r.GetFrame(1);
-    CHECK_EQUAL(1080, f->GetImage()->width());
-    CHECK_EQUAL(1080, f->GetImage()->height());
+    CHECK(f->GetImage()->width() == 1080);
+    CHECK(f->GetImage()->height() == 1080);
 
     Fraction fps(30000,1000);
     Timeline t1(640, 480, fps, 44100, 2, LAYOUT_STEREO);
@@ -87,21 +84,18 @@ TEST(Check_SVG_Loading)
     // Should scale to 480
     clip1.Reader()->Open();
     f = clip1.Reader()->GetFrame(2);
-    CHECK_EQUAL(480, f->GetImage()->width());
-    CHECK_EQUAL(480, f->GetImage()->height());
+    CHECK(f->GetImage()->width() == 480);
+    CHECK(f->GetImage()->height() == 480);
 
     // Add scale_x and scale_y. Should scale the square SVG
     // by the largest scale keyframe (i.e. 4)
     clip1.scale_x.AddPoint(1.0, 2.0, openshot::LINEAR);
     clip1.scale_y.AddPoint(1.0, 2.0, openshot::LINEAR);
     f = clip1.Reader()->GetFrame(3);
-    CHECK_EQUAL(480 * 2, f->GetImage()->width());
-    CHECK_EQUAL(480 * 2, f->GetImage()->height());
+    CHECK(f->GetImage()->width() == 480 * 2);
+    CHECK(f->GetImage()->height() == 480 * 2);
 
 	// Close reader
 	t1.Close();
 	r.Close();
 }
-
-} // SUITE(QtImageReader)
-
