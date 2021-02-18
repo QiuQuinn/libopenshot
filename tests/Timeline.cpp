@@ -574,6 +574,9 @@ TEST_CASE( "Effect_Blur", "[libopenshot][timeline]" )
 	// Get frame
 	std::shared_ptr<Frame> f = t.GetFrame(1);
 
+	REQUIRE(f != nullptr);
+	CHECK(f->number == 1);
+
 	// Close reader
 	t.Close();
 }

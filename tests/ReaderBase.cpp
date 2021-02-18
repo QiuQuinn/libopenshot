@@ -82,6 +82,9 @@ TEST_CASE( "ReaderBase_Derived_Class", "[libopenshot][readerbase]" )
 
 	auto f = t1.GetFrame(1);
 
+	REQUIRE(f != nullptr);
+	CHECK(f->number == 1);
+
 	// Check some of the default values of the FileInfo struct on the base class
 	CHECK_FALSE(t1.info.has_audio);
 	CHECK_FALSE(t1.info.has_audio);

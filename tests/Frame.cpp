@@ -52,7 +52,7 @@ TEST_CASE( "Default_Constructor", "[libopenshot][frame]" )
 	// Create a "blank" default Frame
 	std::shared_ptr<Frame> f1(new Frame());
 
-	CHECK(f1 != nullptr);  // Test aborts here if we didn't get a Frame
+	REQUIRE(f1 != nullptr);  // Test aborts here if we didn't get a Frame
 
 	// Check basic default parameters
 	CHECK(f1->GetHeight() == 1);
@@ -67,7 +67,7 @@ TEST_CASE( "Default_Constructor", "[libopenshot][frame]" )
 	// Calling GetImage() paints a blank frame, by default
 	std::shared_ptr<QImage> i1 = f1->GetImage();
 
-	CHECK(i1 != nullptr);
+	REQUIRE(i1 != nullptr);
 
 	CHECK(f1->has_image_data == true);
 	CHECK(f1->has_audio_data == false);
@@ -85,7 +85,7 @@ TEST_CASE( "Data_Access", "[libopenshot][frame]" )
 	// Get first frame
 	std::shared_ptr<Frame> f1 = c1.GetFrame(1);
 
-	CHECK(f1 != nullptr);
+	REQUIRE(f1 != nullptr);
 
 	CHECK(f1->number == 1);
 	CHECK(f1->GetWidth() == 1280);
@@ -101,9 +101,9 @@ TEST_CASE( "AddImage_QImage", "[libopenshot][frame]" )
 	// Load an image
 	std::stringstream path;
 	path << TEST_MEDIA_PATH << "front.png";
-	std::shared_ptr<QImage> i1(new QImage(QString::fromStdString(path.str()))) ;
+	auto i1 = std::make_shared<QImage>(QString::fromStdString(path.str()));
 
-	CHECK(f1 != nullptr);  // Test aborts here if we didn't get a Frame
+	REQUIRE(f1 != nullptr);  // Test aborts here if we didn't get a Frame
 	CHECK(i1->isNull() == false);
 
 	f1->AddImage(i1);
@@ -123,7 +123,7 @@ TEST_CASE( "Copy_Constructor", "[libopenshot][frame]" )
 	// Load an image
 	std::stringstream path;
 	path << TEST_MEDIA_PATH << "front.png";
-	std::shared_ptr<QImage> i1( new QImage(QString::fromStdString(path.str())) );
+	auto i1 = std::make_shared<QImage>(QString::fromStdString(path.str()));
 
 	CHECK(i1->isNull() == false);
 
