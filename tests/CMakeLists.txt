@@ -43,7 +43,6 @@ endif()
 ###  TEST SOURCE FILES
 ###
 set(OPENSHOT_TESTS
-  Cache
   Clip
   Color
   Coordinate
@@ -78,9 +77,13 @@ endif()
 if (TESTS_ENABLED AND USE_CATCH2)
   message (STATUS "Tests enabled, test executables will be compiled")
   include(Catch)
-
   include(CTest)
 
+  # The unit test codebases have a different set of tests, sigh (my own fault)
+  list(APPEND OPENSHOT_TESTS
+    CacheDisk
+    CacheMemory
+  )
 
   foreach(tname ${OPENSHOT_TESTS})
     add_executable(openshot-${tname}-test catch_tests.cpp ${tname}.cpp)
@@ -107,6 +110,9 @@ if (TESTS_ENABLED AND NOT USE_CATCH2)
     set(TESTS_ENABLED OFF PARENT_SCOPE)
     return()
   endif()
+
+  # The unit test codebases have a different set of tests, sigh (my own fault)
+  list(APPEND OPENSHOT_TESTS Cache)
 
   # Include UnitTest++ headers (needed for compile)
   include_directories(${UnitTest++_INCLUDE_DIRS})
