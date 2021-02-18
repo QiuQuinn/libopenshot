@@ -32,18 +32,17 @@
 #include <sstream>
 #include <memory>
 
-#include <catch2/catch.hpp>
-// Prevent name clashes with juce::UnitTest
-#define DONT_SET_USING_JUCE_NAMESPACE 1
-#include "Frame.h"
-#include "Clip.h"
-#include "Fraction.h"
-
 #include <QImage>
 
 #ifdef USE_OPENCV
 #include <opencv2/core.hpp>
 #endif
+
+#include <catch2/catch.hpp>
+
+#include "Frame.h"
+#include "Clip.h"
+#include "Fraction.h"
 
 using namespace openshot;
 

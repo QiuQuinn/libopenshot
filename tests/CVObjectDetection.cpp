@@ -33,8 +33,7 @@
 #include <memory>
 
 #include <catch2/catch.hpp>
-// Prevent name clashes with juce::UnitTest
-#define DONT_SET_USING_JUCE_NAMESPACE 1
+
 #include "Clip.h"
 #include "CVObjectDetection.h"
 #include "ProcessingController.h"

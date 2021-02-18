@@ -28,21 +28,19 @@
  * along with OpenShot Library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef USE_IMAGEMAGICK
+
 #include <sstream>
 #include <memory>
 
 #include <catch2/catch.hpp>
-// Prevent name clashes with juce::UnitTest
-#define DONT_SET_USING_JUCE_NAMESPACE 1
 
-#ifdef USE_IMAGEMAGICK
 #include "ImageWriter.h"
 #include "Exceptions.h"
 #include "ImageReader.h"
 #include "FFmpegReader.h"
 #include "Frame.h"
 
-using namespace std;
 using namespace openshot;
 
 TEST_CASE( "Gif", "[libopenshot][imagewriter]" )
@@ -54,7 +52,7 @@ TEST_CASE( "Gif", "[libopenshot][imagewriter]" )
 	CHECK_THROWS_AS(bad_r.Open(), InvalidFile);
 
 	// Good path
-	stringstream path;
+	std::stringstream path;
 	path << TEST_MEDIA_PATH << "sintel_trailer-720p.mp4";
 	FFmpegReader r(path.str());
 
@@ -114,4 +112,4 @@ TEST_CASE( "Gif", "[libopenshot][imagewriter]" )
 	CHECK((int)pixels[pixel_index + 2] == Approx(11).margin(5));
 	CHECK((int)pixels[pixel_index + 3] == Approx(255).margin(5));
 }
-#endif
+#endif  // USE_IMAGEMAGICK

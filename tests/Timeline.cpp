@@ -28,13 +28,13 @@
  * along with OpenShot Library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string>
 #include <sstream>
 #include <memory>
 #include <list>
 
 #include <catch2/catch.hpp>
-// Prevent name clashes with juce::UnitTest
-#define DONT_SET_USING_JUCE_NAMESPACE 1
+
 #include "Timeline.h"
 #include "Clip.h"
 #include "Frame.h"

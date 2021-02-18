@@ -29,16 +29,15 @@
  */
 
 #include <memory>
+#include <string>
 
 #include <catch2/catch.hpp>
-// Prevent name clashes with juce::UnitTest
-#define DONT_SET_USING_JUCE_NAMESPACE 1
+
 #include "ReaderBase.h"
 #include "CacheBase.h"
 #include "Frame.h"
 #include "Json.h"
 
-using namespace std;
 using namespace openshot;
 
 // Since it is not possible to instantiate an abstract class, this test creates
@@ -54,12 +53,12 @@ TEST_CASE( "ReaderBase_Derived_Class", "[libopenshot][readerbase]" )
 		std::shared_ptr<Frame> GetFrame(int64_t number) { std::shared_ptr<Frame> f(new Frame()); return f; }
 		void Close() { };
 		void Open() { };
-		string Json() const { return ""; };
-		void SetJson(string value) { };
+		std::string Json() const { return ""; };
+		void SetJson(std::string value) { };
 		Json::Value JsonValue() const { return Json::Value("{}"); };
 		void SetJsonValue(Json::Value root) { };
 		bool IsOpen() { return true; };
-		string Name() { return "TestReader"; };
+		std::string Name() { return "TestReader"; };
 	};
 
 	// Create an instance of the derived class

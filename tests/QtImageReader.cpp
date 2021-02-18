@@ -29,12 +29,14 @@
  */
 
 #include <catch2/catch.hpp>
-// Prevent name clashes with juce::UnitTest
-#define DONT_SET_USING_JUCE_NAMESPACE 1
-#include "QGuiApplication"
-#include "OpenShot.h"
 
-using namespace std;
+#include <QGuiApplication>
+
+#include "QtImageReader.h"
+#include "Frame.h"
+#include "Clip.h"
+#include "Timeline.h"
+
 using namespace openshot;
 
 TEST_CASE( "Default_Constructor", "[libopenshot][qtimagereader]" )
@@ -46,7 +48,7 @@ TEST_CASE( "Default_Constructor", "[libopenshot][qtimagereader]" )
 TEST_CASE( "GetFrame_Before_Opening", "[libopenshot][qtimagereader]" )
 {
 	// Create a reader
-	stringstream path;
+	std::stringstream path;
 	path << TEST_MEDIA_PATH << "front.png";
     QtImageReader r(path.str());
 
@@ -57,7 +59,7 @@ TEST_CASE( "GetFrame_Before_Opening", "[libopenshot][qtimagereader]" )
 TEST_CASE( "Check_SVG_Loading", "[libopenshot][qtimagereader]" )
 {
 	// Create a reader
-	stringstream path;
+	std::stringstream path;
 	path << TEST_MEDIA_PATH << "1F0CF.svg";
     QtImageReader r(path.str());
 	r.Open();

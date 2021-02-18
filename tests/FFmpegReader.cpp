@@ -32,8 +32,7 @@
 #include <memory>
 
 #include <catch2/catch.hpp>
-// Prevent name clashes with juce::UnitTest
-#define DONT_SET_USING_JUCE_NAMESPACE 1
+
 #include "FFmpegReader.h"
 #include "Exceptions.h"
 #include "Frame.h"
