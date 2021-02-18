@@ -361,10 +361,8 @@ TEST_CASE( "CacheDisk_Set_Max_Bytes", "[libopenshot][cache]" )
 
 TEST_CASE( "CacheDisk_Multiple_Remove", "[libopenshot][cache]" )
 {
-	QDir temp_path = QDir::tempPath() + QString("/multiple_remove/");
-
-	// Create cache object
-	CacheDisk c(temp_path.path().toStdString(), "PPM", 1.0, 0.25);
+	// Create cache object in default temp_path()/preview-cache location
+	CacheDisk c("", "PPM", 1.0, 0.25);
 
 	// Add frames to disk cache
 	for (int i = 1; i <= 20; i++)
@@ -389,6 +387,7 @@ TEST_CASE( "CacheDisk_Multiple_Remove", "[libopenshot][cache]" )
 	CHECK(c.Count() == 0);
 
 	// Delete cache directory
+	QDir temp_path = QDir::tempPath() + "/preview-cache/";
 	temp_path.removeRecursively();
 }
 
