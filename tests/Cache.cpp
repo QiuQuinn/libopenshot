@@ -29,15 +29,13 @@
  */
 
 #include <memory>
+#include <QDir>
 
 #include <catch2/catch.hpp>
-// Prevent name clashes with juce::UnitTest
-#define DONT_SET_USING_JUCE_NAMESPACE 1
+
 #include "CacheDisk.h"
 #include "CacheMemory.h"
 #include "Json.h"
-
-#include <QDir>
 
 using namespace openshot;
 
@@ -311,8 +309,10 @@ TEST_CASE( "Multiple_Remove", "[libopenshot][cache]" )
 
 TEST_CASE( "CacheDisk_Set_Max_Bytes", "[libopenshot][cache]" )
 {
+	QDir temp_path = QDir::tempPath() + QString("/set_max_bytes/");
+
 	// Create cache object (using platform /temp/ directory)
-	CacheDisk c("", "PPM", 1.0, 0.25);
+	CacheDisk c(temp_path.path().toStdString(), "PPM", 1.0, 0.25);
 
 	// Add frames to disk cache
 	for (int i = 0; i < 20; i++)
@@ -356,14 +356,15 @@ TEST_CASE( "CacheDisk_Set_Max_Bytes", "[libopenshot][cache]" )
 	CHECK(c.Count() == 0);
 
 	// Delete cache directory
-	QDir path = QDir::tempPath() + QString("/preview-cache/");
-	path.removeRecursively();
+	temp_path.removeRecursively();
 }
 
 TEST_CASE( "CacheDisk_Multiple_Remove", "[libopenshot][cache]" )
 {
-	// Create cache object (using platform /temp/ directory)
-	CacheDisk c("", "PPM", 1.0, 0.25);
+	QDir temp_path = QDir::tempPath() + QString("/multiple_remove/");
+
+	// Create cache object
+	CacheDisk c(temp_path.path().toStdString(), "PPM", 1.0, 0.25);
 
 	// Add frames to disk cache
 	for (int i = 1; i <= 20; i++)
@@ -388,14 +389,15 @@ TEST_CASE( "CacheDisk_Multiple_Remove", "[libopenshot][cache]" )
 	CHECK(c.Count() == 0);
 
 	// Delete cache directory
-	QDir path = QDir::tempPath() + QString("/preview-cache/");
-	path.removeRecursively();
+	temp_path.removeRecursively();
 }
 
 TEST_CASE( "CacheDisk_JSON", "[libopenshot][cache]" )
 {
+	QDir temp_path = QDir::tempPath() + QString("/cache_json/");
+
 	// Create cache object (using platform /temp/ directory)
-	CacheDisk c("", "PPM", 1.0, 0.25);
+	CacheDisk c(temp_path.path().toStdString(), "PPM", 1.0, 0.25);
 
 	// Add some frames (out of order)
 	std::shared_ptr<Frame> f3(new Frame(3, 1280, 720, "Blue", 500, 2));
@@ -428,8 +430,7 @@ TEST_CASE( "CacheDisk_JSON", "[libopenshot][cache]" )
 	CHECK(c.JsonValue()["version"].asString() == "5");
 
 	// Delete cache directory
-	QDir path = QDir::tempPath() + QString("/preview-cache/");
-	path.removeRecursively();
+	temp_path.removeRecursively();
 }
 
 TEST_CASE( "CacheMemory_JSON", "[libopenshot][cache]" )
