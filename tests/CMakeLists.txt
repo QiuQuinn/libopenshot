@@ -85,8 +85,12 @@ if (TESTS_ENABLED AND USE_CATCH2)
     CacheMemory
   )
 
+  # Create object library for test executable main(),
+  # to avoid recompiling for every test
+  add_library(catch-main OBJECT catch_main.cpp)
+
   foreach(tname ${OPENSHOT_TESTS})
-    add_executable(openshot-${tname}-test catch_tests.cpp ${tname}.cpp)
+    add_executable(openshot-${tname}-test ${tname}.cpp $<TARGET_OBJECTS:catch-main>)
   	target_link_libraries(openshot-${tname}-test Catch2::Catch2 openshot)
 		# Automatically configure CTest targets from Catch2 test cases
 		catch_discover_tests(
