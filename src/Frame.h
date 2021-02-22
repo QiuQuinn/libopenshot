@@ -32,8 +32,8 @@
 #define OPENSHOT_FRAME_H
 
 #ifdef USE_OPENCV
-	#define int64 opencv_broken_int
-	#define uint64 opencv_broken_uint
+	#define int64 int64_t
+	#define uint64 uint64_t
 	#include <opencv2/imgproc/imgproc.hpp>
 	#undef uint64
 	#undef int64

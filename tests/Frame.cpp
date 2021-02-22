@@ -35,7 +35,11 @@
 #include <QImage>
 
 #ifdef USE_OPENCV
+#define int64 int64_t
+#define uint64 uint64_t
 #include <opencv2/core.hpp>
+#undef int64
+#undef uint64
 #endif
 
 #include <catch2/catch.hpp>

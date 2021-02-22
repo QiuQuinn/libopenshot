@@ -31,19 +31,19 @@
 #ifndef OPENSHOT_CVTRACKER_H
 #define OPENSHOT_CVTRACKER_H
 
-#define int64 opencv_broken_int
-#define uint64 opencv_broken_uint
+#define int64 int64_t
+#define uint64 uint64_t
 #include <opencv2/opencv.hpp>
 #include <opencv2/tracking.hpp>
 #include <opencv2/core.hpp>
 #undef uint64
 #undef int64
 
-#include <fstream>
 #include "Clip.h"
 #include "KeyFrame.h"
 #include "Frame.h"
 #include "Json.h"
+
 #include "ProcessingController.h"
 #include "protobuf_messages/trackerdata.pb.h"
 
