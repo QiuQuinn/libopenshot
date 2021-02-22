@@ -32,6 +32,7 @@
 
 #include "Point.h"
 #include "Enums.h"
+#include "Exceptions.h"
 #include "Coordinate.h"
 #include "Json.h"
 
@@ -158,6 +159,11 @@ TEST_CASE( "SetJson", "[libopenshot][point]" )
 {
 	openshot::Point p1;
 	std::stringstream json_stream;
+
+	// A string that's not JSON should cause an exception
+	CHECK_THROWS_AS(p1.SetJson("}{"), openshot::InvalidJSON);
+
+	// Build a valid JSON string for Point settings
 	json_stream << R"json(
 		{
 			"co": { "X": 1.0, "Y": 0.0 },
@@ -171,6 +177,7 @@ TEST_CASE( "SetJson", "[libopenshot][point]" )
 	json_stream << R"json(
 		}
 		)json";
+
 	p1.SetJson(json_stream.str());
 	CHECK(p1.handle_left.X == 2.0);
 	CHECK(p1.handle_left.Y == 3.0);
