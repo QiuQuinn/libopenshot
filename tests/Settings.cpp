@@ -41,7 +41,6 @@ TEST_CASE( "Default_Constructor", "[libopenshot][settings]" )
 
 	CHECK(s->OMP_THREADS == 12);
 	CHECK_FALSE(s->HIGH_QUALITY_SCALING);
-	CHECK_FALSE(s->WAIT_FOR_VIDEO_PROCESSING_TASK);
 }
 
 TEST_CASE( "Change_Settings", "[libopenshot][settings]" )
@@ -50,13 +49,10 @@ TEST_CASE( "Change_Settings", "[libopenshot][settings]" )
 	Settings *s = Settings::Instance();
 	s->OMP_THREADS = 8;
 	s->HIGH_QUALITY_SCALING = true;
-	s->WAIT_FOR_VIDEO_PROCESSING_TASK = true;
 
 	CHECK(s->OMP_THREADS == 8);
 	CHECK(s->HIGH_QUALITY_SCALING == true);
-	CHECK(s->WAIT_FOR_VIDEO_PROCESSING_TASK == true);
 
 	CHECK(Settings::Instance()->OMP_THREADS == 8);
 	CHECK(Settings::Instance()->HIGH_QUALITY_SCALING == true);
-	CHECK(Settings::Instance()->WAIT_FOR_VIDEO_PROCESSING_TASK == true);
 }

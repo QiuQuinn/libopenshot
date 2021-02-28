@@ -248,5 +248,5 @@ TEST_CASE( "verify parent Timeline", "[libopenshot][clip]" )
 
 	// Check size of frame image (with an associated timeline)
 	CHECK(640 == c1.GetFrame(1)->GetImage()->width());
-	CHECK(480 == c1.GetFrame(1)->GetImage()->height());
+	CHECK(360 == c1.GetFrame(1)->GetImage()->height());
 }
